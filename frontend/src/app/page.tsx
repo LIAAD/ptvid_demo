@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Home() {
   const [text, setText] = useState('');
-  const [results, setResults] = useState<{
-    ptPT: number;
-    ptBR: number;
-  } | null>(null);
+  const [results, setResults] = useState({
+    ptPT: 0,
+    ptBR: 0
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [hasClassified, setHasClassified] = useState(false);
 
   const handleCompare = async () => {
     if (!text.trim()) return;
@@ -32,9 +34,9 @@ export default function Home() {
         ptPT: probability,
         ptBR: 1 - probability,
       });
+      setHasClassified(true);
     } catch (error) {
       console.error('Error comparing text:', error);
-      // You might want to show an error message to the user here
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +50,8 @@ export default function Home() {
 
   const clearText = () => {
     setText('');
-    setResults(null);
+    setResults({ ptPT: 0, ptBR: 0 });
+    setHasClassified(false);
   };
 
   return (
@@ -64,46 +67,68 @@ export default function Home() {
         </div>
 
         {/* Input Container */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <div className="relative">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={handleKeyPress}
-              className="flex min-h-[180px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-base ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-light-blue focus-visible:ring-offset-2"
-              placeholder="Enter text to classify (Press ⌘+Return to classify)"
-              autoFocus
-            />
-          </div>
+        <div className="mb-8">
+          <Textarea
+            value={text}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
+            onKeyDown={handleKeyPress}
+            className="min-h-[120px] resize-none focus-visible:ring-light-blue"
+            placeholder="Enter text to classify (Press ⌘+Return to classify)"
+            autoFocus
+          />
         </div>
 
-        {/* Results */}
-        {results && (
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <div className="space-y-4">
-              <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden">
-                <div 
-                  className="absolute top-0 left-0 h-full bg-light-blue transition-all duration-500 rounded-full flex items-center justify-end pr-4"
-                  style={{ width: `${results.ptPT * 100}%` }}
-                >
-                  <span className="text-white font-medium">
+        {/* Results - Always visible */}
+        <div className="mb-8">
+          <div className="relative h-14 bg-gray-100 rounded-full overflow-hidden">
+            {/* PT-PT Score (Left side) */}
+            <div 
+              className={`absolute top-0 left-0 h-full bg-light-blue transition-all duration-500 flex items-center
+                ${!hasClassified ? 'opacity-30' : ''}`}
+              style={{ width: `${results.ptPT * 100}%` }}
+            >
+              <span className={`text-white font-medium ml-4 whitespace-nowrap ${results.ptPT < 0.15 ? 'opacity-0' : ''}`}>
+                PT-PT: {(results.ptPT * 100).toFixed(1)}%
+              </span>
+            </div>
+            
+            {/* PT-BR Score (Right side) */}
+            <div 
+              className={`absolute top-0 right-0 h-full bg-dark-blue transition-all duration-500 flex items-center justify-end
+                ${!hasClassified ? 'opacity-30' : ''}`}
+              style={{ width: `${results.ptBR * 100}%` }}
+            >
+              <span className={`text-white font-medium mr-4 whitespace-nowrap ${results.ptBR < 0.15 ? 'opacity-0' : ''}`}>
+                PT-BR: {(results.ptBR * 100).toFixed(1)}%
+              </span>
+            </div>
+
+            {/* Center Labels (shown when scores are too small) */}
+            {hasClassified && (results.ptPT < 0.15 || results.ptBR < 0.15) && (
+              <div className="absolute inset-0 flex items-center justify-center gap-8">
+                {results.ptPT < 0.15 && (
+                  <span className="text-light-blue font-medium whitespace-nowrap">
                     PT-PT: {(results.ptPT * 100).toFixed(1)}%
                   </span>
-                </div>
-              </div>
-              <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden">
-                <div 
-                  className="absolute top-0 left-0 h-full bg-dark-blue transition-all duration-500 rounded-full flex items-center justify-end pr-4"
-                  style={{ width: `${results.ptBR * 100}%` }}
-                >
-                  <span className="text-white font-medium">
+                )}
+                {results.ptBR < 0.15 && (
+                  <span className="text-dark-blue font-medium whitespace-nowrap">
                     PT-BR: {(results.ptBR * 100).toFixed(1)}%
                   </span>
-                </div>
+                )}
               </div>
-            </div>
+            )}
+
+            {/* Default state message */}
+            {!hasClassified && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-gray-400 font-medium">
+                  Enter text and click Classify to see results
+                </span>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Buttons */}
         <div className="flex justify-center gap-4">
