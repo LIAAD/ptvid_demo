@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 
 export default function Home() {
@@ -11,6 +11,19 @@ export default function Home() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [hasClassified, setHasClassified] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [text]);
 
   const handleCompare = async () => {
     if (!text.trim()) return;
@@ -54,9 +67,13 @@ export default function Home() {
     setHasClassified(false);
   };
 
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  };
+
   return (
-    <main className="pt-12 pb-16 min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gray-50 flex items-center">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-dark-blue mb-4">
             Portuguese Variety Identifier
@@ -69,16 +86,17 @@ export default function Home() {
         {/* Input Container */}
         <div className="mb-8">
           <Textarea
+            ref={textareaRef}
             value={text}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
+            onChange={handleTextChange}
             onKeyDown={handleKeyPress}
-            className="min-h-[120px] resize-none focus-visible:ring-light-blue"
-            placeholder="Enter text to classify (Press ⌘+Return to classify)"
+            className="w-full text-lg placeholder:text-gray-400 text-center overflow-hidden"
+            placeholder=""
             autoFocus
           />
         </div>
 
-        {/* Results - Always visible */}
+        {/* Results */}
         <div className="mb-8">
           <div className="relative h-14 bg-gray-100 rounded-full overflow-hidden">
             {/* Fixed Position Labels */}
@@ -112,13 +130,13 @@ export default function Home() {
           <button
             onClick={handleCompare}
             disabled={isLoading}
-            className="px-6 py-3 bg-light-blue text-white rounded-lg hover:bg-blue-500 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-32 px-6 py-3 bg-light-blue text-white rounded-lg hover:bg-blue-500 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Classifying...' : 'Classify'}
           </button>
           <button
             onClick={clearText}
-            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+            className="w-32 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
           >
             Clear
           </button>
