@@ -79,7 +79,7 @@ export default function Home() {
             Portuguese Variety Identifier
           </h1>
           <p className="text-gray-600">
-            Identify whether a text is written in European Portuguese (PT-PT) or Brazilian Portuguese (PT-BR)
+            Identify whether a text is written in European Portuguese or Brazilian Portuguese.
           </p>
         </div>
 
@@ -102,10 +102,10 @@ export default function Home() {
             {/* Fixed Position Labels */}
             <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
               <span className={`font-medium whitespace-nowrap ${hasClassified ? 'text-white' : 'text-gray-400'}`}>
-                PT-PT: {hasClassified ? (results.ptPT * 100).toFixed(1) : '0.0'}%
+                European: {hasClassified ? (results.ptPT * 100).toFixed(1) : '0.0'}%
               </span>
               <span className={`font-medium whitespace-nowrap ${hasClassified ? 'text-white' : 'text-gray-400'}`}>
-                PT-BR: {hasClassified ? (results.ptBR * 100).toFixed(1) : '0.0'}%
+                Brazilian: {hasClassified ? (results.ptBR * 100).toFixed(1) : '0.0'}%
               </span>
             </div>
 

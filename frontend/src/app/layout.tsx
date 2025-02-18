@@ -14,8 +14,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: 'PTvid - Portuguese Variety Identifier',
-  description: 'Identify whether a text is written in European Portuguese (PT-PT) or Brazilian Portuguese (PT-BR)',
+  title: 'PtVId',
+  description: 'Identify whether a text is written in European Portuguese and Brazilian Portuguese',
 };
 
 export default function RootLayout({
