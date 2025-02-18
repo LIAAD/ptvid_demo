@@ -1,101 +1,127 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [text, setText] = useState('');
+  const [results, setResults] = useState<{
+    ptPT: number;
+    ptBR: number;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleCompare = async () => {
+    if (!text.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/compare', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to classify text');
+      }
+
+      const probability = await response.json();
+      setResults({
+        ptPT: probability,
+        ptBR: 1 - probability,
+      });
+    } catch (error) {
+      console.error('Error comparing text:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      handleCompare();
+    }
+  };
+
+  const clearText = () => {
+    setText('');
+    setResults(null);
+  };
+
+  return (
+    <main className="pt-12 pb-16 min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-dark-blue mb-4">
+            Portuguese Variety Identifier
+          </h1>
+          <p className="text-gray-600">
+            Identify whether a text is written in European Portuguese (PT-PT) or Brazilian Portuguese (PT-BR)
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Input Container */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="relative">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={handleKeyPress}
+              className="flex min-h-[180px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-base ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-light-blue focus-visible:ring-offset-2"
+              placeholder="Enter text to classify (Press ⌘+Return to classify)"
+              autoFocus
+            />
+          </div>
+        </div>
+
+        {/* Results */}
+        {results && (
+          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div className="space-y-4">
+              <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-light-blue transition-all duration-500 rounded-full flex items-center justify-end pr-4"
+                  style={{ width: `${results.ptPT * 100}%` }}
+                >
+                  <span className="text-white font-medium">
+                    PT-PT: {(results.ptPT * 100).toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+              <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-dark-blue transition-all duration-500 rounded-full flex items-center justify-end pr-4"
+                  style={{ width: `${results.ptBR * 100}%` }}
+                >
+                  <span className="text-white font-medium">
+                    PT-BR: {(results.ptBR * 100).toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={handleCompare}
+            disabled={isLoading}
+            className="px-6 py-3 bg-light-blue text-white rounded-lg hover:bg-blue-500 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Classifying...' : 'Classify'}
+          </button>
+          <button
+            onClick={clearText}
+            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </main>
   );
-}
+} 
