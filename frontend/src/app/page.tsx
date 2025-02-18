@@ -81,52 +81,29 @@ export default function Home() {
         {/* Results - Always visible */}
         <div className="mb-8">
           <div className="relative h-14 bg-gray-100 rounded-full overflow-hidden">
-            {/* PT-PT Score (Left side) */}
-            <div 
-              className={`absolute top-0 left-0 h-full bg-light-blue transition-all duration-500 flex items-center
-                ${!hasClassified ? 'opacity-30' : ''}`}
-              style={{ width: `${results.ptPT * 100}%` }}
-            >
-              <span className={`text-white font-medium ml-4 whitespace-nowrap ${results.ptPT < 0.15 ? 'opacity-0' : ''}`}>
-                PT-PT: {(results.ptPT * 100).toFixed(1)}%
+            {/* Fixed Position Labels */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
+              <span className={`font-medium whitespace-nowrap ${hasClassified ? 'text-white' : 'text-gray-400'}`}>
+                PT-PT: {hasClassified ? (results.ptPT * 100).toFixed(1) : '0.0'}%
+              </span>
+              <span className={`font-medium whitespace-nowrap ${hasClassified ? 'text-white' : 'text-gray-400'}`}>
+                PT-BR: {hasClassified ? (results.ptBR * 100).toFixed(1) : '0.0'}%
               </span>
             </div>
+
+            {/* PT-PT Score (Left side) */}
+            <div 
+              className={`absolute top-0 left-0 h-full bg-light-blue transition-all duration-500
+                ${!hasClassified ? 'opacity-30' : ''}`}
+              style={{ width: `${results.ptPT * 100}%` }}
+            />
             
             {/* PT-BR Score (Right side) */}
             <div 
-              className={`absolute top-0 right-0 h-full bg-dark-blue transition-all duration-500 flex items-center justify-end
+              className={`absolute top-0 right-0 h-full bg-dark-blue transition-all duration-500
                 ${!hasClassified ? 'opacity-30' : ''}`}
               style={{ width: `${results.ptBR * 100}%` }}
-            >
-              <span className={`text-white font-medium mr-4 whitespace-nowrap ${results.ptBR < 0.15 ? 'opacity-0' : ''}`}>
-                PT-BR: {(results.ptBR * 100).toFixed(1)}%
-              </span>
-            </div>
-
-            {/* Center Labels (shown when scores are too small) */}
-            {hasClassified && (results.ptPT < 0.15 || results.ptBR < 0.15) && (
-              <div className="absolute inset-0 flex items-center justify-center gap-8">
-                {results.ptPT < 0.15 && (
-                  <span className="text-light-blue font-medium whitespace-nowrap">
-                    PT-PT: {(results.ptPT * 100).toFixed(1)}%
-                  </span>
-                )}
-                {results.ptBR < 0.15 && (
-                  <span className="text-dark-blue font-medium whitespace-nowrap">
-                    PT-BR: {(results.ptBR * 100).toFixed(1)}%
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* Default state message */}
-            {!hasClassified && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-gray-400 font-medium">
-                  Enter text and click Classify to see results
-                </span>
-              </div>
-            )}
+            />
           </div>
         </div>
 
