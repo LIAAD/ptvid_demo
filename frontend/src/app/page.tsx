@@ -169,7 +169,7 @@ export default function Home() {
               Paper
             </a>
             <a
-              href="https://huggingface.co/liaad/PtVI"
+              href="https://huggingface.co/liaad/PtVId"
               target="_blank"
               rel="noopener noreferrer"
               className="text-light-blue hover:text-blue-600 transition-colors font-medium"
@@ -177,7 +177,7 @@ export default function Home() {
               Model
             </a>
             <a
-              href="https://github.com/hmosousa/tradutor"
+              href="https://github.com/liaad/portuguese_vid"
               target="_blank"
               rel="noopener noreferrer"
               className="text-light-blue hover:text-blue-600 transition-colors font-medium"
