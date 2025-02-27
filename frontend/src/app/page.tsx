@@ -161,7 +161,7 @@ export default function Home() {
           </p>
           <div className="text-xs text-gray-500 space-x-4">
             <a
-              href="https://drive.inesctec.pt/s/NjroDrmLc4CdZ86/download/vid.pdf"
+              href="https://arxiv.org/abs/2502.14394"
               target="_blank"
               rel="noopener noreferrer"
               className="text-light-blue hover:text-blue-600 transition-colors font-medium"
